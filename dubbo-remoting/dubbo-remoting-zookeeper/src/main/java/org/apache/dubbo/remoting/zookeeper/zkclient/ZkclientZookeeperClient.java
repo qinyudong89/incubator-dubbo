@@ -30,16 +30,25 @@ import org.apache.zookeeper.Watcher.Event.KeeperState;
 
 import java.util.List;
 
+/**
+ *  基于 ZkClient 的实现
+ */
 public class ZkclientZookeeperClient extends AbstractZookeeperClient<IZkChildListener> {
 
+    /**
+     * client 对象
+     */
     private final ZkClientWrapper client;
 
     private volatile KeeperState state = KeeperState.SyncConnected;
 
     public ZkclientZookeeperClient(URL url) {
         super(url);
+        //获取超时时间，默认为30000
         long timeout = url.getParameter(Constants.TIMEOUT_KEY, 30000L);
+        // 创建 client 对象
         client = new ZkClientWrapper(url.getBackupAddress(), timeout);
+        // 添加连接监听器
         client.addListener(new IZkStateListener() {
             @Override
             public void handleStateChanged(KeeperState state) throws Exception {
@@ -56,6 +65,7 @@ public class ZkclientZookeeperClient extends AbstractZookeeperClient<IZkChildLis
                 stateChanged(StateListener.RECONNECTED);
             }
         });
+        // 启动 client
         client.start();
     }
 

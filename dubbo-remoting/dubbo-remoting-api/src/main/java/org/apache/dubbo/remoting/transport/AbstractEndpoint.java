@@ -29,15 +29,27 @@ import org.apache.dubbo.remoting.transport.codec.CodecAdapter;
 
 /**
  * AbstractEndpoint
+ *
+ * 实现 Resetable 接口，继承 AbstractPeer 抽象类，端点抽象类。
+ *
  */
 public abstract class AbstractEndpoint extends AbstractPeer implements Resetable {
 
     private static final Logger logger = LoggerFactory.getLogger(AbstractEndpoint.class);
 
+    /**
+     * 编解码器
+     */
     private Codec2 codec;
 
+    /**
+     * 超时时间
+     */
     private int timeout;
 
+    /**
+     * 连接超时时间
+     */
     private int connectTimeout;
 
     public AbstractEndpoint(URL url, ChannelHandler handler) {
@@ -49,6 +61,7 @@ public abstract class AbstractEndpoint extends AbstractPeer implements Resetable
 
     protected static Codec2 getChannelCodec(URL url) {
         String codecName = url.getParameter(Constants.CODEC_KEY, "telnet");
+        // 例如，在 DubboProtocol 中，会获得 DubboCodec
         if (ExtensionLoader.getExtensionLoader(Codec2.class).hasExtension(codecName)) {
             return ExtensionLoader.getExtensionLoader(Codec2.class).getExtension(codecName);
         } else {
@@ -57,6 +70,10 @@ public abstract class AbstractEndpoint extends AbstractPeer implements Resetable
         }
     }
 
+    /**
+     * 使用新的 url 属性，可重置 codec timeout connectTimeout 属性
+     * @param url
+     */
     @Override
     public void reset(URL url) {
         if (isClosed()) {

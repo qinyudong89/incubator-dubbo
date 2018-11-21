@@ -22,6 +22,9 @@ import org.apache.dubbo.common.URL;
 
 /**
  * ThreadLocalCacheFactory
+ *
+ * 实现 AbstractCacheFactory 抽象类
+ *
  */
 public class ThreadLocalCacheFactory extends AbstractCacheFactory {
 

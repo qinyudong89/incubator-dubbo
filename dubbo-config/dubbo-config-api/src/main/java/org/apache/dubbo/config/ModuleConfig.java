@@ -23,6 +23,9 @@ import java.util.List;
 
 /**
  * ModuleConfig
+ * 模块信息配置
+ *
+ * https://dubbo.incubator.apache.org/zh-cn/docs/user/references/xml/dubbo-module.html
  *
  * @export
  */

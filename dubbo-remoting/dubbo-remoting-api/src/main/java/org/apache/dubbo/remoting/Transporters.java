@@ -24,11 +24,14 @@ import org.apache.dubbo.remoting.transport.ChannelHandlerDispatcher;
 
 /**
  * Transporter facade. (API, Static, ThreadSafe)
+ * Transporter 门面类
+ *
  */
 public class Transporters {
 
     static {
         // check duplicate jar package
+        // 检查是否有重复的代码
         Version.checkDuplicate(Transporters.class);
         Version.checkDuplicate(RemotingException.class);
     }
@@ -36,6 +39,13 @@ public class Transporters {
     private Transporters() {
     }
 
+    /**
+     * 静态方法，绑定一个服务器
+     * @param url
+     * @param handler
+     * @return
+     * @throws RemotingException
+     */
     public static Server bind(String url, ChannelHandler... handler) throws RemotingException {
         return bind(URL.valueOf(url), handler);
     }
@@ -47,15 +57,24 @@ public class Transporters {
         if (handlers == null || handlers.length == 0) {
             throw new IllegalArgumentException("handlers == null");
         }
+        // 创建 handler
         ChannelHandler handler;
         if (handlers.length == 1) {
             handler = handlers[0];
         } else {
             handler = new ChannelHandlerDispatcher(handlers);
         }
+        // 创建Server 对象
         return getTransporter().bind(url, handler);
     }
 
+    /**
+     * 连接一个服务器，即创建一个客户端
+     * @param url
+     * @param handler
+     * @return
+     * @throws RemotingException
+     */
     public static Client connect(String url, ChannelHandler... handler) throws RemotingException {
         return connect(URL.valueOf(url), handler);
     }
@@ -75,6 +94,14 @@ public class Transporters {
         return getTransporter().connect(url, handler);
     }
 
+    /**
+     * 基于 Dubbo SPI 机制，获得 Transporter$Adaptive 对象
+     *
+     * 会根据 url 参数，获得对应的 Transporter 实现对象（例如， NettyTransporter），
+     * 从而创建对应的 Server 对象（例如， NettyServer）。
+     *
+     * @return
+     */
     public static Transporter getTransporter() {
         return ExtensionLoader.getExtensionLoader(Transporter.class).getAdaptiveExtension();
     }

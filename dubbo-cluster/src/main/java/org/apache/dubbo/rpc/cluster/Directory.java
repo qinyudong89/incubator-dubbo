@@ -25,6 +25,9 @@ import java.util.List;
 
 /**
  * Directory. (SPI, Prototype, ThreadSafe)
+ * 继承 Node 接口，Directory 接口
+ * 线程安全， SPI
+ * 一个 Directory 只对应一个服务类型。
  * <p>
  * <a href="http://en.wikipedia.org/wiki/Directory_service">Directory Service</a>
  *
@@ -35,12 +38,16 @@ public interface Directory<T> extends Node {
     /**
      * get service type.
      *
+     * 获得服务类型，例如：com.alibaba.dubbo.demo.DemoService
+     *
      * @return service type.
      */
     Class<T> getInterface();
 
     /**
      * list invokers.
+     *
+     * 获得所有服务 Invoker 集合
      *
      * @return invokers
      */

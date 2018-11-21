@@ -29,8 +29,13 @@ import org.apache.dubbo.rpc.listener.ListenerExporterWrapper;
 import org.apache.dubbo.rpc.listener.ListenerInvokerWrapper;
 
 import java.util.Collections;
+import java.util.List;
 
 /**
+ *
+ * 实现 Protocol 接口，Protocol 的 Wrapper 拓展实现类，
+ * 用于给 Exporter 增加 ExporterListener ，监听 Exporter 暴露完成和取消暴露完成
+ *
  * ListenerProtocol
  */
 public class ProtocolListenerWrapper implements Protocol {
@@ -51,19 +56,35 @@ public class ProtocolListenerWrapper implements Protocol {
 
     @Override
     public <T> Exporter<T> export(Invoker<T> invoker) throws RpcException {
+        // 注册中心
         if (Constants.REGISTRY_PROTOCOL.equals(invoker.getUrl().getProtocol())) {
             return protocol.export(invoker);
         }
-        return new ListenerExporterWrapper<T>(protocol.export(invoker),
-                Collections.unmodifiableList(ExtensionLoader.getExtensionLoader(ExporterListener.class)
-                        .getActivateExtension(invoker.getUrl(), Constants.EXPORTER_LISTENER_KEY)));
+        // 暴露服务，创建 Exporter 对象
+        // 获得 ExporterListener 数组
+        // 创建带 ExporterListener 的 Exporter 对象
+//        return new ListenerExporterWrapper<T>(protocol.export(invoker),
+//                Collections.unmodifiableList(ExtensionLoader.getExtensionLoader(ExporterListener.class)
+//                        .getActivateExtension(invoker.getUrl(), Constants.EXPORTER_LISTENER_KEY)));
+
+        // 暴露服务，创建 Exporter 对象
+        Exporter<T> exporter = protocol.export(invoker);
+        // 获得 ExporterListener 数组
+        List<ExporterListener> listeners = Collections.unmodifiableList(ExtensionLoader.getExtensionLoader(ExporterListener.class).getActivateExtension(invoker.getUrl(), Constants.EXPORTER_LISTENER_KEY));
+        // 创建带 ExporterListener 的 Exporter 对象
+        return new ListenerExporterWrapper<T>(exporter, listeners);
+
     }
 
     @Override
     public <T> Invoker<T> refer(Class<T> type, URL url) throws RpcException {
+        // 注册中心协议
         if (Constants.REGISTRY_PROTOCOL.equals(url.getProtocol())) {
             return protocol.refer(type, url);
         }
+        // 引用服务
+        // 获得 InvokerListener 数组
+        // 创建 ListenerInvokerWrapper 对象
         return new ListenerInvokerWrapper<T>(protocol.refer(type, url),
                 Collections.unmodifiableList(
                         ExtensionLoader.getExtensionLoader(InvokerListener.class)

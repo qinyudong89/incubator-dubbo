@@ -22,6 +22,13 @@ import java.io.Serializable;
 
 /**
  * @export
+ *
+ * ArgumentConfig
+ *
+ * 方法参数配置
+ *
+ * https://dubbo.incubator.apache.org/zh-cn/docs/user/references/xml/dubbo-argument.html
+ *
  */
 public class ArgumentConfig implements Serializable {
 

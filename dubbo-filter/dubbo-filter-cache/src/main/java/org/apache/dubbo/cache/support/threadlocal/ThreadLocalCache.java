@@ -24,9 +24,17 @@ import java.util.Map;
 
 /**
  * ThreadLocalCache
+ *
+ * 基于 ThreadLocal ，当前线程缓存，比如一个页面渲染，
+ * 用到很多 portal，每个 portal 都要去查用户信息，通过线程缓存，可以减少这种多余访问。
+ * ThreadLocalCache 目前没有过期或清理机制，所以需要注意
+ *
  */
 public class ThreadLocalCache implements Cache {
 
+    /**
+     *  线程变量
+     */
     private final ThreadLocal<Map<Object, Object>> store;
 
     public ThreadLocalCache(URL url) {

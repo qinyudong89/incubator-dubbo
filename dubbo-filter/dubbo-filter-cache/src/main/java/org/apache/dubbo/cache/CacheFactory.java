@@ -23,10 +23,19 @@ import org.apache.dubbo.rpc.Invocation;
 
 /**
  * CacheFactory
+ *
+ * Cache 工厂接口  默认为lru
  */
 @SPI("lru")
 public interface CacheFactory {
 
+    /**
+     * 获得缓存对象
+     *
+     * @param url URL 对象
+     * @return 缓存对象
+     */
+    //基于 Dubbo SPI Adaptive 机制，加载对应的 Cache 实现
     @Adaptive("cache")
     Cache getCache(URL url, Invocation invocation);
 

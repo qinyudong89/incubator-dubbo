@@ -19,6 +19,10 @@ package org.apache.dubbo.config;
 /**
  * ConsumerConfig
  *
+ * 实现 AbstractReferenceConfig ，服务消费者缺省值配置。
+ *
+ * https://dubbo.incubator.apache.org/zh-cn/docs/user/references/xml/dubbo-consumer.html
+ *
  * @export
  */
 public class ConsumerConfig extends AbstractReferenceConfig {

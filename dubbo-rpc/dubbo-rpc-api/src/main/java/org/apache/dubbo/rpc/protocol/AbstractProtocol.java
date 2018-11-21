@@ -32,14 +32,26 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
+ *
+ * 实现 Protocol 接口，协议抽象类
+ *
  * abstract ProtocolSupport.
  */
 public abstract class AbstractProtocol implements Protocol {
 
     protected final Logger logger = LoggerFactory.getLogger(getClass());
 
+    /**
+     * Exporter 集合
+     *
+     * key: 服务键 {@link #serviceKey(URL)} 或 {@link URL#getServiceKey()} 。
+     *      不同协议会不同
+     */
     protected final Map<String, Exporter<?>> exporterMap = new ConcurrentHashMap<String, Exporter<?>>();
 
+    /**
+     * Invoker 集合
+     */
     //TODO SOFEREFENCE
     protected final Set<Invoker<?>> invokers = new ConcurrentHashSet<Invoker<?>>();
 

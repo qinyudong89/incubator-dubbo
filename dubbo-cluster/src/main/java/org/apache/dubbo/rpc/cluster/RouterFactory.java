@@ -25,6 +25,8 @@ import org.apache.dubbo.common.extension.SPI;
  * <p>
  * <a href="http://en.wikipedia.org/wiki/Routing">Routing</a>
  *
+ *
+ *
  * @see org.apache.dubbo.rpc.cluster.Cluster#join(Directory)
  * @see org.apache.dubbo.rpc.cluster.Directory#list(org.apache.dubbo.rpc.Invocation)
  */
@@ -34,10 +36,13 @@ public interface RouterFactory {
     /**
      * Create router.
      *
+     * 创建 Router 对象
+     *
      * @param url
      * @return router
      */
     @Adaptive("protocol")
+    //基于 Dubbo SPI Adaptive 机制，加载对应的 Router 实现，使用 URL.protocol 属性。
     Router getRouter(URL url);
 
 }

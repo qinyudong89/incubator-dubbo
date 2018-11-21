@@ -20,6 +20,8 @@ import org.apache.dubbo.common.Resetable;
 
 /**
  * Remoting Client. (API/SPI, Prototype, ThreadSafe)
+ * 客户端接口
+ *
  * <p>
  * <a href="http://en.wikipedia.org/wiki/Client%E2%80%93server_model">Client/Server</a>
  *
@@ -27,6 +29,7 @@ import org.apache.dubbo.common.Resetable;
  */
 public interface Client extends Endpoint, Channel, Resetable {
 
+    // 重连
     /**
      * reconnect.
      */

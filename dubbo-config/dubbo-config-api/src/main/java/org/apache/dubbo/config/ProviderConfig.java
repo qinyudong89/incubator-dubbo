@@ -32,7 +32,12 @@ import java.util.Arrays;
  *
  * @export
  * @see org.apache.dubbo.config.ProtocolConfig
+ *
+ * https://dubbo.incubator.apache.org/zh-cn/docs/user/references/xml/dubbo-protocol.html
+ *
  * @see org.apache.dubbo.config.ServiceConfig
+ *
+ *
  */
 public class ProviderConfig extends AbstractServiceConfig {
 

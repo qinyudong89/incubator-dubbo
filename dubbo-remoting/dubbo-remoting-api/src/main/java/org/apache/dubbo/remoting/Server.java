@@ -23,6 +23,8 @@ import java.util.Collection;
 
 /**
  * Remoting Server. (API/SPI, Prototype, ThreadSafe)
+ * 服务器接口
+ *
  * <p>
  * <a href="http://en.wikipedia.org/wiki/Client%E2%80%93server_model">Client/Server</a>
  *
@@ -30,8 +32,10 @@ import java.util.Collection;
  */
 public interface Server extends Endpoint, Resetable {
 
+
     /**
      * is bound.
+     * 是否绑定本地端口，提供服务。即，是否启动成功，可连接，接收消息等。
      *
      * @return bound
      */
@@ -39,7 +43,7 @@ public interface Server extends Endpoint, Resetable {
 
     /**
      * get channels.
-     *
+     * 获取连上的服务器通道（客户端)们
      * @return channels
      */
     Collection<Channel> getChannels();

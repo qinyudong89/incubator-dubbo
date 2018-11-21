@@ -18,6 +18,8 @@ package org.apache.dubbo.common;
 
 /**
  * Resetable.
+ * 可重置接口
+ *
  */
 public interface Resetable {
 

@@ -31,12 +31,16 @@ import java.util.Map;
 
 /**
  * ContextInvokerFilter
+ *
+ * 服务提供者的 ContextFilter 实现类
+ *
  */
 @Activate(group = Constants.PROVIDER, order = -10000)
 public class ContextFilter extends AbstractPostProcessFilter {
 
     @Override
     public Result invoke(Invoker<?> invoker, Invocation invocation) throws RpcException {
+        // 创建新的 `attachments` 集合，清理公用的隐式参数
         Map<String, String> attachments = invocation.getAttachments();
         if (attachments != null) {
             attachments = new HashMap<String, String>(attachments);
@@ -47,7 +51,9 @@ public class ContextFilter extends AbstractPostProcessFilter {
             attachments.remove(Constants.TOKEN_KEY);
             attachments.remove(Constants.TIMEOUT_KEY);
             attachments.remove(Constants.ASYNC_KEY);// Remove async property to avoid being passed to the following invoke chain.
+            // 清空消费端的异步参数
         }
+        // 设置 RpcContext 对象
         RpcContext.getContext()
                 .setInvoker(invoker)
                 .setInvocation(invocation)
@@ -57,6 +63,7 @@ public class ContextFilter extends AbstractPostProcessFilter {
 
         // merged from dubbox
         // we may already added some attachments into RpcContext before this filter (e.g. in rest protocol)
+        // 在此过滤器(例如rest协议)之前，我们可能已经在RpcContext中添加了一些附件。
         // TODO
         if (attachments != null) {
             if (RpcContext.getContext().getAttachments() != null) {
@@ -65,13 +72,15 @@ public class ContextFilter extends AbstractPostProcessFilter {
                 RpcContext.getContext().setAttachments(attachments);
             }
         }
-
+        // 设置 RpcInvocation 对象的 `invoker` 属性
         if (invocation instanceof RpcInvocation) {
             ((RpcInvocation) invocation).setInvoker(invoker);
         }
+        // 服务调用
         try {
             return postProcessResult(invoker.invoke(invocation), invoker, invocation);
         } finally {
+            // 移除上下文
             // IMPORTANT! For async scenario, we must remove context from current thread, so we always create a new RpcContext for the next invoke for the same thread.
             RpcContext.removeContext();
             RpcContext.removeServerContext();

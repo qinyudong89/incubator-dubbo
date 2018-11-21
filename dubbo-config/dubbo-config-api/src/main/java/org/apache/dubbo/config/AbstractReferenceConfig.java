@@ -24,6 +24,12 @@ import org.apache.dubbo.rpc.support.ProtocolUtils;
 /**
  * AbstractConsumerConfig
  *
+ * 实现 AbstractInterfaceConfig ，抽象引用配置类
+ *
+ * https://dubbo.incubator.apache.org/zh-cn/docs/user/references/xml/dubbo-reference.html
+ *
+ * https://dubbo.incubator.apache.org/zh-cn/docs/user/references/xml/dubbo-consumer.html
+ *
  * @export
  * @see org.apache.dubbo.config.ReferenceConfig
  */

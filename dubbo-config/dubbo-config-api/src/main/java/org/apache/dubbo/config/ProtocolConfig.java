@@ -33,6 +33,10 @@ import java.util.Map;
 /**
  * ProtocolConfig
  *
+ * 服务提供者协议配置
+ *
+ * https://dubbo.incubator.apache.org/zh-cn/docs/user/references/xml/dubbo-protocol.html
+ *
  * @export
  */
 public class ProtocolConfig extends AbstractConfig {
@@ -473,7 +477,9 @@ public class ProtocolConfig extends AbstractConfig {
 
     /**
      * Just for compatibility.
+     * 仅仅考虑兼容性
      * It should be deleted in the next major version, say 2.7.x.
+     * 将会在2.7版本删除
      */
     @Deprecated
     public static void destroyAll() {

@@ -26,9 +26,16 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * The shutdown hook thread to do the clean up stuff.
+ * 关闭钩子线程目的去做清空操作
+ *
  * This is a singleton in order to ensure there is only one shutdown hook registered.
+ * 这是一个单例类，目的是确保只有有个线程
+ *
  * Because {@link ApplicationShutdownHooks} use {@link java.util.IdentityHashMap}
  * to store the shutdown hooks.
+ *
+ * 因为使用了 XXXX存储  shutdown hooks.
+ *
  */
 public class DubboShutdownHook extends Thread {
 
@@ -42,6 +49,7 @@ public class DubboShutdownHook extends Thread {
 
     /**
      * Has it already been destroyed or not?
+     * 是否已经被销毁过了
      */
     private final AtomicBoolean destroyed;
 
@@ -60,19 +68,24 @@ public class DubboShutdownHook extends Thread {
 
     /**
      * Destroy all the resources, including registries and protocols.
+     * 销毁所有的资源，包括 registries 和 protocols
      */
     public void destroyAll() {
+        //若是以销毁，忽略
         if (!destroyed.compareAndSet(false, true)) {
             return;
         }
         // destroy all the registries
+        // 销毁Registry 相关
         AbstractRegistryFactory.destroyAll();
         // destroy all the protocols
+        // 销毁 Protocol 相关
         destroyProtocols();
     }
 
     /**
      * Destroy all the protocols.
+     * 销毁所有的 protocols
      */
     private void destroyProtocols() {
         ExtensionLoader<Protocol> loader = ExtensionLoader.getExtensionLoader(Protocol.class);

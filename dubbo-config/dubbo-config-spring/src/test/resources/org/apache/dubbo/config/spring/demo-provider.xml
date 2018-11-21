@@ -30,8 +30,16 @@
     <dubbo:protocol name="dubbo" port="20813"/>
 
     <!-- service configuration -->
-    <dubbo:service interface="org.apache.dubbo.config.spring.api.DemoService" ref="demoService"/>
+    <dubbo:service interface="org.apache.dubbo.config.spring.api.DemoService" ref="demoService" deprecated="true"/>
 
-    <bean id="demoService" class="org.apache.dubbo.config.spring.impl.DemoServiceImpl"/>
+    <!--
+     * 通过设置 `"deprecated"` 为 `true` 来设置。
+     * 该方式仅适用于**远程引用**服务。
 
-</beans>
+     * 在 `#referred(invoker)` 方法中，打印错误日志，例如：
+
+    -->
+
+     <bean id="demoService" class="org.apache.dubbo.config.spring.impl.DemoServiceImpl"/>
+
+ </beans>

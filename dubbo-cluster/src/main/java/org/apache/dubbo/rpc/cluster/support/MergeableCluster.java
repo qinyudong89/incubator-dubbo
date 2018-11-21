@@ -21,6 +21,9 @@ import org.apache.dubbo.rpc.RpcException;
 import org.apache.dubbo.rpc.cluster.Cluster;
 import org.apache.dubbo.rpc.cluster.Directory;
 
+/**
+ * 实现 Cluster 接口，分组聚合 Cluster 实现类
+ */
 public class MergeableCluster implements Cluster {
 
     public static final String NAME = "mergeable";

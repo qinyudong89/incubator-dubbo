@@ -29,42 +29,79 @@ import java.util.Map;
 /**
  * ApplicationConfig
  *
+ * https://dubbo.incubator.apache.org/zh-cn/docs/user/references/xml/dubbo-application.html
+ *
+ * 应用配置
+ *
  * @export
  */
 public class ApplicationConfig extends AbstractConfig {
 
     private static final long serialVersionUID = 5508512956753757169L;
 
+    /**
+     * 当前应用名称
+     */
     // application name
     private String name;
 
+    /**
+     * 当前应用的版本
+     */
     // module version
     private String version;
 
+    /**
+     * 应用负责人
+     */
     // application owner
     private String owner;
 
+    /**
+     * 组织名称(BU或部门)
+     */
     // application's organization (BU)
     private String organization;
 
+    /**
+     * 用于服务分层对应的架构
+     */
     // architecture layer
     private String architecture;
 
+    /**
+     * 应用环境 dev product test
+     */
     // environment, e.g. dev, test or production
     private String environment;
 
+    /**
+     * Java字节码编译器
+     */
     // Java compiler
     private String compiler;
 
+    /**
+     * 日志输出方式
+     */
     // logger
     private String logger;
 
+    /**
+     * 注册中心
+     */
     // registry centers
     private List<RegistryConfig> registries;
 
+    /**
+     * 监控中心
+     */
     // monitor center
     private MonitorConfig monitor;
 
+    /**
+     * 是否默认
+     */
     // is default or not
     private Boolean isDefault;
 
@@ -203,6 +240,7 @@ public class ApplicationConfig extends AbstractConfig {
 
     public void setLogger(String logger) {
         this.logger = logger;
+        // 设置 LoggerAdapter
         LoggerFactory.setLoggerAdapter(logger);
     }
 

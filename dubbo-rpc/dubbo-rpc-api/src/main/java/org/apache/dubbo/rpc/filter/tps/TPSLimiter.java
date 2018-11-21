@@ -19,10 +19,15 @@ package org.apache.dubbo.rpc.filter.tps;
 import org.apache.dubbo.common.URL;
 import org.apache.dubbo.rpc.Invocation;
 
+/**
+ * TPS 限制器接口
+ */
 public interface TPSLimiter {
 
     /**
      * judge if the current invocation is allowed by TPS rule
+     *
+     * 根据 tps 限流规则判断是否限制此次调用
      *
      * @param url        url
      * @param invocation invocation

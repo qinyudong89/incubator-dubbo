@@ -24,6 +24,8 @@ import java.util.List;
 /**
  * MethodConfig
  *
+ * https://dubbo.incubator.apache.org/zh-cn/docs/user/references/xml/dubbo-method.html
+ *
  * @export
  */
 public class MethodConfig extends AbstractMethodConfig {

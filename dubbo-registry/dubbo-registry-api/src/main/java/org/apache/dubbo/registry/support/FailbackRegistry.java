@@ -39,25 +39,55 @@ import java.util.concurrent.TimeUnit;
 /**
  * FailbackRegistry. (SPI, Prototype, ThreadSafe)
  *
+ * 实现 AbstractRegistry 抽象类，支持失败重试的 Registry 抽象类。
+ * 线程安全的
+ *
+ * FailbackRegistry 在 AbstractRegistry 的基础上，
+ * 实现了和注册中心实际的操作，并且支持失败重试的特性
+ *
  */
 public abstract class FailbackRegistry extends AbstractRegistry {
 
+    /**
+     * 定时任务执行器
+     */
     // Scheduled executor service
     private final ScheduledExecutorService retryExecutor = Executors.newScheduledThreadPool(1, new NamedThreadFactory("DubboRegistryFailedRetryTimer", true));
 
+    /**
+     * 失败重试定时器，定时检查是否有请求失败，如有，无限次重试
+     */
     // Timer for failure retry, regular check if there is a request for failure, and if there is, an unlimited retry
     private final ScheduledFuture<?> retryFuture;
 
+    /**
+     * 失败发起注册失败的 URL 集合
+     */
     private final Set<URL> failedRegistered = new ConcurrentHashSet<URL>();
 
+    /**
+     *  失败取消注册失败的 URL 集合
+     */
     private final Set<URL> failedUnregistered = new ConcurrentHashSet<URL>();
 
+    /**
+     * 失败发起订阅失败的监听器集合
+     */
     private final ConcurrentMap<URL, Set<NotifyListener>> failedSubscribed = new ConcurrentHashMap<URL, Set<NotifyListener>>();
 
+    /**
+     * 失败取消订阅失败的监听器集合
+     */
     private final ConcurrentMap<URL, Set<NotifyListener>> failedUnsubscribed = new ConcurrentHashMap<URL, Set<NotifyListener>>();
 
+    /**
+     * 失败通知通知的 URL 集合
+     */
     private final ConcurrentMap<URL, Map<NotifyListener, List<URL>>> failedNotified = new ConcurrentHashMap<URL, Map<NotifyListener, List<URL>>>();
 
+    /**
+     * 重试执行器重试前需要进行多久的等待
+     */
     /**
      * The time in milliseconds the retryExecutor will wait
      */
@@ -65,7 +95,9 @@ public abstract class FailbackRegistry extends AbstractRegistry {
 
     public FailbackRegistry(URL url) {
         super(url);
+        // 重试频率，单位：毫秒
         this.retryPeriod = url.getParameter(Constants.REGISTRY_RETRY_PERIOD_KEY, Constants.DEFAULT_REGISTRY_RETRY_PERIOD);
+        // 创建失败重试定时器
         this.retryFuture = retryExecutor.scheduleWithFixedDelay(new Runnable() {
             @Override
             public void run() {
@@ -438,10 +470,15 @@ public abstract class FailbackRegistry extends AbstractRegistry {
         }
     }
 
+    /**
+     * 销毁其对应的客户端连接的逻辑
+     */
     @Override
     public void destroy() {
+        // 调用父方法，取消注册和订阅
         super.destroy();
         try {
+            // 关闭 Zookeeper 客户端连接
             retryFuture.cancel(true);
         } catch (Throwable t) {
             logger.warn(t.getMessage(), t);

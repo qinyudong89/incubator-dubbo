@@ -28,6 +28,7 @@ import java.util.List;
 
 /**
  * AvailableCluster
+ * 实现 Cluster 接口，调用首个可用服务器
  *
  */
 public class AvailableCluster implements Cluster {
@@ -37,6 +38,7 @@ public class AvailableCluster implements Cluster {
     @Override
     public <T> Invoker<T> join(Directory<T> directory) throws RpcException {
 
+        //对应 Invoker 实现类为 AvailableClusterInvoker
         return new AbstractClusterInvoker<T>(directory) {
             @Override
             public Result doInvoke(Invocation invocation, List<Invoker<T>> invokers, LoadBalance loadbalance) throws RpcException {

@@ -23,6 +23,8 @@ import org.apache.dubbo.rpc.cluster.Directory;
 
 /**
  * {@link FailfastClusterInvoker}
+ * 快速失败，只发起一次调用，失败立即报错。
+ * 通常用于非幂等性的写操作，比如新增记录
  *
  */
 public class FailfastCluster implements Cluster {
@@ -31,6 +33,7 @@ public class FailfastCluster implements Cluster {
 
     @Override
     public <T> Invoker<T> join(Directory<T> directory) throws RpcException {
+        //对应 Invoker 实现类为 FailfastClusterInvoker 。
         return new FailfastClusterInvoker<T>(directory);
     }
 

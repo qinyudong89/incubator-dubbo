@@ -386,13 +386,16 @@ public class UrlUtils {
     }
 
     public static boolean isMatchGlobPattern(String pattern, String value, URL param) {
+        // 以美元符 `$` 开头，表示引用参数
         if (param != null && pattern.startsWith("$")) {
             pattern = param.getRawParameter(pattern.substring(1));
         }
+        // 匹配
         return isMatchGlobPattern(pattern, value);
     }
 
     public static boolean isMatchGlobPattern(String pattern, String value) {
+        // 全匹配
         if ("*".equals(pattern))
             return true;
         if ((pattern == null || pattern.length() == 0)

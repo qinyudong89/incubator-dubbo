@@ -22,6 +22,10 @@ import org.apache.dubbo.common.URL;
 
 /**
  * JCacheFactory
+ *
+ * 实现 AbstractCacheFactory 抽象类
+ *
+ *
  */
 public class JCacheFactory extends AbstractCacheFactory {
 

@@ -30,11 +30,19 @@ import java.util.concurrent.ConcurrentMap;
 /**
  * Round robin load balance.
  *
+ * 存在慢的提供者累积请求的问题，比如：第二台机器很慢，
+ * 但没挂，当请求调到第二台时就卡在那，久而久之，所有请求都卡在调到第二台上。
+ *
  */
 public class RoundRobinLoadBalance extends AbstractLoadBalance {
 
     public static final String NAME = "roundrobin";
 
+    /**
+     *  服务方法与计数器的映射
+     *
+     *  KEY：serviceKey + "." + methodName
+     */
     private final ConcurrentMap<String, AtomicPositiveInteger> sequences = new ConcurrentHashMap<String, AtomicPositiveInteger>();
 
     @Override
@@ -45,6 +53,7 @@ public class RoundRobinLoadBalance extends AbstractLoadBalance {
         int minWeight = Integer.MAX_VALUE; // The minimum weight
         final LinkedHashMap<Invoker<T>, IntegerWrapper> invokerToWeightMap = new LinkedHashMap<Invoker<T>, IntegerWrapper>();
         int weightSum = 0;
+        // 计算最小、最大权重，总的权重和。
         for (int i = 0; i < length; i++) {
             int weight = getWeight(invokers.get(i), invocation);
             maxWeight = Math.max(maxWeight, weight); // Choose the maximum weight
@@ -54,21 +63,26 @@ public class RoundRobinLoadBalance extends AbstractLoadBalance {
                 weightSum += weight;
             }
         }
+        // 计算最小、最大权重，总的权重和。
         AtomicPositiveInteger sequence = sequences.get(key);
         if (sequence == null) {
             sequences.putIfAbsent(key, new AtomicPositiveInteger());
             sequence = sequences.get(key);
         }
+        // 获得当前顺序号，并递增 + 1
         int currentSequence = sequence.getAndIncrement();
+        // 权重不相等，顺序根据权重分配
         if (maxWeight > 0 && minWeight < maxWeight) {
-            int mod = currentSequence % weightSum;
-            for (int i = 0; i < maxWeight; i++) {
+            int mod = currentSequence % weightSum;// 剩余权重
+            for (int i = 0; i < maxWeight; i++) {// 循环最大权重
                 for (Map.Entry<Invoker<T>, IntegerWrapper> each : invokerToWeightMap.entrySet()) {
                     final Invoker<T> k = each.getKey();
                     final IntegerWrapper v = each.getValue();
+                    // 剩余权重归 0 ，当前 Invoker 还有剩余权重，返回该 Invoker 对象
                     if (mod == 0 && v.getValue() > 0) {
                         return k;
                     }
+                    // 若 Invoker 还有权重值，扣除它( value )和剩余权重( mod )。
                     if (v.getValue() > 0) {
                         v.decrement();
                         mod--;
@@ -76,6 +90,7 @@ public class RoundRobinLoadBalance extends AbstractLoadBalance {
                 }
             }
         }
+        // 权重相等，平均顺序获得
         // Round robin
         return invokers.get(currentSequence % length);
     }

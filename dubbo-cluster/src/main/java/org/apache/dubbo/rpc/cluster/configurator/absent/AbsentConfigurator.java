@@ -21,6 +21,7 @@ import org.apache.dubbo.rpc.cluster.configurator.AbstractConfigurator;
 
 /**
  * AbsentConfigurator
+ * 实现 AbstractConfigurator 抽象类，absent Configurator 实现类
  *
  */
 public class AbsentConfigurator extends AbstractConfigurator {
@@ -31,7 +32,7 @@ public class AbsentConfigurator extends AbstractConfigurator {
 
     @Override
     public URL doConfigure(URL currentUrl, URL configUrl) {
-        return currentUrl.addParametersIfAbsent(configUrl.getParameters());
+        return currentUrl.addParametersIfAbsent(configUrl.getParameters());// 不存在时添加
     }
 
 }

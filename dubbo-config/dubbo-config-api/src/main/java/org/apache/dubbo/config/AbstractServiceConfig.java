@@ -26,6 +26,10 @@ import java.util.List;
 /**
  * AbstractServiceConfig
  *
+ * 实现 AbstractInterfaceConfig ，抽象服务配置类。
+ *
+ * https://dubbo.incubator.apache.org/zh-cn/docs/user/references/xml/dubbo-provider.html
+ *
  * @export
  */
 public abstract class AbstractServiceConfig extends AbstractInterfaceConfig {

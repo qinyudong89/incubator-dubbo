@@ -44,6 +44,12 @@ import java.util.Map;
 /**
  * AbstractDefaultConfig
  *
+ * 继承 AbstractMethodConfig ，抽象接口配置类
+ *
+ * https://dubbo.incubator.apache.org/zh-cn/docs/user/references/xml/dubbo-service.html
+ *
+ * https://dubbo.incubator.apache.org/zh-cn/docs/user/references/xml/dubbo-reference.html
+ *
  * @export
  */
 public abstract class AbstractInterfaceConfig extends AbstractMethodConfig {
@@ -156,29 +162,44 @@ public abstract class AbstractInterfaceConfig extends AbstractMethodConfig {
         }
     }
 
+    /**
+    * @Description:    加载注册中心，
+    * @Param: [provider] 是否是服务提供者
+    * @return: java.util.List<org.apache.dubbo.common.URL>
+    * @Author: wangsc
+    * @Date: 2018/9/14
+    */
     protected List<URL> loadRegistries(boolean provider) {
+        //检查 RegistryConfig 配置数组
         checkRegistry();
+        // 创建 注册中心 URL 数组
         List<URL> registryList = new ArrayList<URL>();
         if (registries != null && !registries.isEmpty()) {
             for (RegistryConfig config : registries) {
+                // 获得注册中心的地址
                 String address = config.getAddress();
                 if (address == null || address.length() == 0) {
                     address = Constants.ANYHOST_VALUE;
                 }
+                //从启动函数获取
                 String sysaddress = System.getProperty("dubbo.registry.address");
                 if (sysaddress != null && sysaddress.length() > 0) {
                     address = sysaddress;
                 }
+                // 有效的地址
                 if (address.length() > 0 && !RegistryConfig.NO_AVAILABLE.equalsIgnoreCase(address)) {
                     Map<String, String> map = new HashMap<String, String>();
+                    // 将各种配置对象，添加到 `map` 集合中。
                     appendParameters(map, application);
                     appendParameters(map, config);
+                    // 添加 `path` `dubbo` `timestamp` `pid` 到 `map` 集合中。
                     map.put("path", RegistryService.class.getName());
                     map.put("dubbo", Version.getProtocolVersion());
                     map.put(Constants.TIMESTAMP_KEY, String.valueOf(System.currentTimeMillis()));
                     if (ConfigUtils.getPid() > 0) {
                         map.put(Constants.PID_KEY, String.valueOf(ConfigUtils.getPid()));
                     }
+                    // 若不存在 `protocol` 参数，默认 "dubbo" 添加到 `map` 集合中。
                     if (!map.containsKey("protocol")) {
                         if (ExtensionLoader.getExtensionLoader(RegistryFactory.class).hasExtension("remote")) {
                             map.put("protocol", "remote");
@@ -186,12 +207,16 @@ public abstract class AbstractInterfaceConfig extends AbstractMethodConfig {
                             map.put("protocol", "dubbo");
                         }
                     }
+                    // 解析地址，创建 Dubbo URL 数组。（数组大小可以为一）
                     List<URL> urls = UrlUtils.parseURLs(address, map);
+                    // 循环 `url` ，设置 "registry" 和 "protocol" 属性。
                     for (URL url : urls) {
+                        // 设置 `registry=${protocol}` 和 `protocol=registry` 到 URL
                         url = url.addParameter(Constants.REGISTRY_KEY, url.getProtocol());
                         url = url.setProtocol(Constants.REGISTRY_PROTOCOL);
-                        if ((provider && url.getParameter(Constants.REGISTER_KEY, true))
-                                || (!provider && url.getParameter(Constants.SUBSCRIBE_KEY, true))) {
+                        // 添加到结果
+                        if ((provider && url.getParameter(Constants.REGISTER_KEY, true))// 服务提供者 && 注册
+                                || (!provider && url.getParameter(Constants.SUBSCRIBE_KEY, true))) {// 服务消费者 && 订阅
                             registryList.add(url);
                         }
                     }
@@ -200,8 +225,15 @@ public abstract class AbstractInterfaceConfig extends AbstractMethodConfig {
         }
         return registryList;
     }
-
+    /** 
+    * @Description:   加载监控中心 URL
+    * @Param: [registryURL 注册中心 URL  ]
+    * @return: org.apache.dubbo.common.URL  监控中心 URL
+    * @Author: wangsc
+    * @Date: 2018/9/17 
+    */ 
     protected URL loadMonitor(URL registryURL) {
+        // 从 属性配置 中加载配置到 MonitorConfig 对象。
         if (monitor == null) {
             String monitorAddress = ConfigUtils.getProperty("dubbo.monitor.address");
             String monitorProtocol = ConfigUtils.getProperty("dubbo.monitor.protocol");
@@ -218,6 +250,7 @@ public abstract class AbstractInterfaceConfig extends AbstractMethodConfig {
             }
         }
         appendProperties(monitor);
+        // 添加 `interface` `dubbo` `timestamp` `pid` 到 `map` 集合中
         Map<String, String> map = new HashMap<String, String>();
         map.put(Constants.INTERFACE_KEY, MonitorService.class.getName());
         map.put("dubbo", Version.getProtocolVersion());
@@ -233,14 +266,18 @@ public abstract class AbstractInterfaceConfig extends AbstractMethodConfig {
             throw new IllegalArgumentException("Specified invalid registry ip from property:" + Constants.DUBBO_IP_TO_REGISTRY + ", value:" + hostToRegistry);
         }
         map.put(Constants.REGISTER_IP_KEY, hostToRegistry);
+        // 将 MonitorConfig ，添加到 `map` 集合中。
         appendParameters(map, monitor);
         appendParameters(map, application);
+        // 获得地址
         String address = monitor.getAddress();
         String sysaddress = System.getProperty("dubbo.monitor.address");
         if (sysaddress != null && sysaddress.length() > 0) {
             address = sysaddress;
         }
+        // 直连监控中心服务器地址
         if (ConfigUtils.isNotEmpty(address)) {
+            // 若不存在 `protocol` 参数，默认 "dubbo" 添加到 `map` 集合中。
             if (!map.containsKey(Constants.PROTOCOL_KEY)) {
                 if (ExtensionLoader.getExtensionLoader(MonitorFactory.class).hasExtension("logstat")) {
                     map.put(Constants.PROTOCOL_KEY, "logstat");
@@ -249,6 +286,8 @@ public abstract class AbstractInterfaceConfig extends AbstractMethodConfig {
                 }
             }
             return UrlUtils.parseURL(address, map);
+
+        // 解析地址，创建 Dubbo URL 对象。
         } else if (Constants.REGISTRY_PROTOCOL.equals(monitor.getProtocol()) && registryURL != null) {
             return registryURL.setProtocol("dubbo").addParameter(Constants.PROTOCOL_KEY, "registry").addParameterAndEncoded(Constants.REFER_KEY, StringUtils.toQueryString(map));
         }
@@ -286,6 +325,10 @@ public abstract class AbstractInterfaceConfig extends AbstractMethodConfig {
         }
     }
 
+    /**
+     * 校验 Stub 和 Mock 相关的配置
+     * @param interfaceClass
+     */
     protected void checkStubAndMock(Class<?> interfaceClass) {
         if (ConfigUtils.isNotEmpty(local)) {
             Class<?> localClass = ConfigUtils.isDefault(local) ? ReflectUtils.forName(interfaceClass.getName() + "Local") : ReflectUtils.forName(local);
@@ -309,19 +352,24 @@ public abstract class AbstractInterfaceConfig extends AbstractMethodConfig {
                 throw new IllegalStateException("No such constructor \"public " + localClass.getSimpleName() + "(" + interfaceClass.getName() + ")\" in local implementation class " + localClass.getName());
             }
         }
+        // mock 配置校验
         if (ConfigUtils.isNotEmpty(mock)) {
-            if (mock.startsWith(Constants.RETURN_PREFIX)) {
+            if (mock.startsWith(Constants.RETURN_PREFIX)) {// 处理 "return " 开头的情况
                 String value = mock.substring(Constants.RETURN_PREFIX.length());
+                // 校验 Mock 值，配置正确
                 try {
                     MockInvoker.parseMockValue(value);
                 } catch (Exception e) {
                     throw new IllegalStateException("Illegal mock json value in <dubbo:service ... mock=\"" + mock + "\" />");
                 }
             } else {
+                // 获得 Mock 类
                 Class<?> mockClass = ConfigUtils.isDefault(mock) ? ReflectUtils.forName(interfaceClass.getName() + "Mock") : ReflectUtils.forName(mock);
+                // 校验是否实现接口类
                 if (!interfaceClass.isAssignableFrom(mockClass)) {
                     throw new IllegalStateException("The mock implementation class " + mockClass.getName() + " not implement interface " + interfaceClass.getName());
                 }
+                // 校验是否有默认构造方法
                 try {
                     mockClass.getConstructor(new Class<?>[0]);
                 } catch (NoSuchMethodException e) {

@@ -37,23 +37,34 @@ import org.apache.zookeeper.WatchedEvent;
 import java.util.Collections;
 import java.util.List;
 
+/**
+ * 实现 ZookeeperTransporter 抽象类，
+ * 基于 Curator 的 Zookeeper 客户端实现类。
+ */
 public class CuratorZookeeperClient extends AbstractZookeeperClient<CuratorWatcher> {
 
+    /**
+     * client 对象
+     */
     private final CuratorFramework client;
 
     public CuratorZookeeperClient(URL url) {
+        //将URL对象引用到抽象类中
         super(url);
         try {
+            //获取超时时间， 默认为5000
             int timeout = url.getParameter(Constants.TIMEOUT_KEY, 5000);
+            // 建造者builder模式创建 client 对象
             CuratorFrameworkFactory.Builder builder = CuratorFrameworkFactory.builder()
-                    .connectString(url.getBackupAddress())
-                    .retryPolicy(new RetryNTimes(1, 1000))
-                    .connectionTimeoutMs(timeout);
+                    .connectString(url.getBackupAddress())// 连接地址
+                    .retryPolicy(new RetryNTimes(1, 1000))// 重试策略，1 次，间隔 1000 ms
+                    .connectionTimeoutMs(timeout);// 连接超时时间
             String authority = url.getAuthority();
             if (authority != null && authority.length() > 0) {
                 builder = builder.authorization("digest", authority.getBytes());
             }
             client = builder.build();
+            // 添加连接监听器
             client.getConnectionStateListenable().addListener(new ConnectionStateListener() {
                 @Override
                 public void stateChanged(CuratorFramework client, ConnectionState state) {
@@ -66,6 +77,7 @@ public class CuratorZookeeperClient extends AbstractZookeeperClient<CuratorWatch
                     }
                 }
             });
+            // 启动 client
             client.start();
         } catch (Exception e) {
             throw new IllegalStateException(e.getMessage(), e);
@@ -133,11 +145,23 @@ public class CuratorZookeeperClient extends AbstractZookeeperClient<CuratorWatch
         client.close();
     }
 
+    /**
+     * 重写父类的抽象方法
+     * @param path
+     * @param listener
+     * @return
+     */
     @Override
     public CuratorWatcher createTargetChildListener(String path, ChildListener listener) {
         return new CuratorWatcherImpl(listener);
     }
 
+    /**
+     * 重写父类的抽象方法
+     * @param path
+     * @param listener
+     * @return
+     */
     @Override
     public List<String> addTargetChildListener(String path, CuratorWatcher listener) {
         try {

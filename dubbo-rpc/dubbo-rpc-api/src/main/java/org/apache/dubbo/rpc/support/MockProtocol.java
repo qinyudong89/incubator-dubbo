@@ -24,6 +24,9 @@ import org.apache.dubbo.rpc.protocol.AbstractProtocol;
 
 /**
  * MockProtocol is used for generating a mock invoker by URL and type on consumer side
+ *
+ * 实现 AbstractProtocol 抽象类，用于在服务消费者，通过类型为 "mock" 的 URL ，引用创建 MockInvoker 对象
+ *
  */
 final public class MockProtocol extends AbstractProtocol {
 
@@ -37,6 +40,14 @@ final public class MockProtocol extends AbstractProtocol {
         throw new UnsupportedOperationException();
     }
 
+    /**
+     * 引用创建 MockInvoker 对象。一般情况下，我们可以通过 dubbo-admin 运维平台或者直接向 Zookeeper 写入静态 URL
+     * @param type 服务的类型
+     * @param url  远程服务的URL地址
+     * @param <T>
+     * @return
+     * @throws RpcException
+     */
     @Override
     public <T> Invoker<T> refer(Class<T> type, URL url) throws RpcException {
         return new MockInvoker<T>(url);

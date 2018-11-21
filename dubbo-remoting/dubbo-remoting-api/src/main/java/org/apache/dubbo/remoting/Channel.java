@@ -20,13 +20,14 @@ import java.net.InetSocketAddress;
 
 /**
  * Channel. (API/SPI, Prototype, ThreadSafe)
- *
+ * 通道接口
  * @see org.apache.dubbo.remoting.Client
  * @see org.apache.dubbo.remoting.Server#getChannels()
  * @see org.apache.dubbo.remoting.Server#getChannel(InetSocketAddress)
  */
 public interface Channel extends Endpoint {
 
+    //******************连接相关*****************//
     /**
      * get remote address.
      *
@@ -41,6 +42,7 @@ public interface Channel extends Endpoint {
      */
     boolean isConnected();
 
+    //*********************属性相关****************//
     /**
      * has attribute.
      *

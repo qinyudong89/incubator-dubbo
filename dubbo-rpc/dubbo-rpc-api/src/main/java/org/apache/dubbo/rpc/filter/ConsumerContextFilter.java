@@ -29,26 +29,33 @@ import org.apache.dubbo.rpc.RpcInvocation;
 
 /**
  * ConsumerContextInvokerFilter
+ *
+ * 服务消费者的 ContextFilter 实现类
+ *
  */
 @Activate(group = Constants.CONSUMER, order = -10000)
 public class ConsumerContextFilter extends AbstractPostProcessFilter {
 
     @Override
     public Result invoke(Invoker<?> invoker, Invocation invocation) throws RpcException {
+        // 设置 RpcContext 对象
         RpcContext.getContext()
                 .setInvoker(invoker)
                 .setInvocation(invocation)
                 .setLocalAddress(NetUtils.getLocalHost(), 0)
                 .setRemoteAddress(invoker.getUrl().getHost(),
                         invoker.getUrl().getPort());
+        // 设置 RpcInvocation 对象的 `invoker` 属性
         if (invocation instanceof RpcInvocation) {
             ((RpcInvocation) invocation).setInvoker(invoker);
         }
+        // 服务调用
         try {
             // TODO should we clear server context?
             RpcContext.removeServerContext();
             return postProcessResult(invoker.invoke(invocation), invoker, invocation);
         } finally {
+            // 清理隐式参数集合
             // TODO removeContext? but we need to save future for RpcContext.getFuture() API. If clear attachments here, attachments will not available when postProcessResult is invoked.
             RpcContext.getContext().clearAttachments();
         }
