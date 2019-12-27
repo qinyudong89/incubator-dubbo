@@ -783,6 +783,7 @@ public class RegistryDirectory<T> extends AbstractDirectory<T> implements Notify
                             + " use dubbo version " + Version.getVersion() + ", please check status of providers(disabled, not registered or in blacklist).");
         }
         List<Invoker<T>> invokers = null;
+        //从methodInvokerMap中取出invokers
         Map<String, List<Invoker<T>>> localMethodInvokerMap = this.methodInvokerMap; // local reference
         // 获得 Invoker 集合
         if (localMethodInvokerMap != null && localMethodInvokerMap.size() > 0) {

@@ -81,6 +81,7 @@ public class MockClusterInvoker<T> implements Invoker<T> {
         if (value.length() == 0 || value.equalsIgnoreCase("false")) {
             //no mock
             // 调用原 Invoker ，发起 RPC 调用
+            // 调用 invoker方法，进入到集群也就是CLuster类中
             result = this.invoker.invoke(invocation);
         //【第二种】强制服务降级
         } else if (value.startsWith("force")) {

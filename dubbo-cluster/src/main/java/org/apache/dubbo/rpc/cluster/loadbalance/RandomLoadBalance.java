@@ -33,6 +33,25 @@ public class RandomLoadBalance extends AbstractLoadBalance {
 
     public static final String NAME = "random";
 
+
+    /**
+     *  10.0.0.1:20884, weight=2
+     *   10.0.0.1:20886, weight=3
+     *   10.0.0.1:20888, weight=4
+     *
+     *  随机算法的实现：
+     *   totalWeight=9;
+     *   假设offset=1（即random.nextInt(9)=1） 1-2=-1<0？是，所以选中 10.0.0.1:20884, weight=2
+     *  假设offset=4（即random.nextInt(9)=4） 4-2=2<0？否，这时候offset=2， 2-3<0？是，所以选中 10.0.0.1:20886, weight=3
+     *  假设offset=7（即random.nextInt(9)=7） 7-2=5<0？否，这时候offset=5， 5-3=2<0？否，这时候offset=2， 2-4<0？是，所以选中 10.0.0.1:20888, weight=4
+     *
+     *
+      * @param invokers
+     * @param url
+     * @param invocation
+     * @param <T>
+     * @return
+     */
     @Override
     protected <T> Invoker<T> doSelect(List<Invoker<T>> invokers, URL url, Invocation invocation) {
         //先获得invoker 集合大小

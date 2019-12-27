@@ -165,6 +165,7 @@ public abstract class AbstractClusterInvoker<T> implements Invoker<T> {
             }
         }
         // 执行选择
+        //<-----------------------------进行选择------------------------------------->
         Invoker<T> invoker = doSelect(loadbalance, invocation, invokers, selected);
 
         // 若开启粘滞连接的特性，记录最终选择的 Invoker 到 stickyInvoker
@@ -371,6 +372,7 @@ public abstract class AbstractClusterInvoker<T> implements Invoker<T> {
      * @throws RpcException
      */
     protected List<Invoker<T>> list(Invocation invocation) throws RpcException {
+        // 通过directory 进入到 AbstractDirectory 中选择 directory
         return directory.list(invocation);
     }
 

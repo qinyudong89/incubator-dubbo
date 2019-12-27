@@ -67,6 +67,7 @@ public class InvokerInvocationHandler implements InvocationHandler {
                 invocation.setAttachment(Constants.ASYNC_KEY, "true");
             }
         }
+        //这里使用的是动态代理的方式获取到指定的代理类
         return invoker.invoke(invocation).recreate();
     }
 

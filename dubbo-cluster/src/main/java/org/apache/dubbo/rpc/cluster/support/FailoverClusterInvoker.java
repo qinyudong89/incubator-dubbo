@@ -96,6 +96,7 @@ public class FailoverClusterInvoker<T> extends AbstractClusterInvoker<T> {
                 checkInvokers(copyinvokers, invocation);
             }
             // 根据负载均衡机制从copyinvokers中选择一个Invoker
+            //< ------------------------- 下面将进行 invoker选择----------------------------------->
             Invoker<T> invoker = select(loadbalance, invocation, copyinvokers, invoked);
             // 保存每次调用的Invoker
             invoked.add(invoker);
